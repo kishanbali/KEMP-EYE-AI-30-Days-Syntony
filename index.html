@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEMP EYE 👁️ AI 30 Days Syntony</title>
+<style>
+  :root {
+    --bg-color: #121614;
+    --card-bg: #1e2622;
+    --accent: #7a8b85;
+    --accent-glow: #a3b8b0;
+    --text-color: #f7f5f0;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .container {
+    background: var(--card-bg);
+    border: 1px solid #2c3833;
+    border-radius: 16px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+  }
+
+  .day-subtitle {
+    font-size: 0.85rem;
+    color: #9da8a3;
+    margin-bottom: 20px;
+  }
+
+  /* Blinking & Expanding Eye Emoji */
+  .eye-wrapper {
+    font-size: 4rem;
+    margin: 15px 0;
+  }
+
+  .pulsing-eye {
+    display: inline-block;
+    animation: none;
+  }
+
+  .pulsing-eye.active {
+    animation: eyePulse 4s infinite ease-in-out;
+  }
+
+  @keyframes eyePulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.35); opacity: 1; text-shadow: 0 0 20px var(--accent-glow); }
+  }
+
+  /* Timer Display */
+  .timer-display {
+    font-size: 2.2rem;
+    font-weight: 300;
+    font-variant-numeric: tabular-nums;
+    margin: 15px 0;
+    letter-spacing: 2px;
+  }
+
+  /* Play / Pause Toggle Button */
+  .play-btn {
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 12px rgba(122, 139, 133, 0.3);
+    margin-bottom: 25px;
+    width: 100%;
+  }
+
+  .play-btn:active {
+    transform: scale(0.96);
+  }
+
+  .play-btn.paused {
+    background-color: #55635e;
+  }
+
+  /* 30-Day Battery Recharge Progress */
+  .battery-container {
+    text-align: left;
+    background: #161c19;
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #25302b;
+  }
+
+  .battery-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+    color: #b0beb8;
+  }
+
+  .battery-track {
+    background: #0d1210;
+    border-radius: 6px;
+    height: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #222d28;
+  }
+
+  .battery-level {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5c8a73, #7cb395);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  /* Footer & Disclaimer */
+  footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #7f8c8d;
+    border-top: 1px solid #222d28;
+    padding-top: 12px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  footer p {
+    margin: 0 0 4px 0;
+  }
+
+  .disclaimer {
+    font-size: 0.6rem;
+    color: #5c6b65;
+    line-height: 1.3;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>KEMP EYE 👁️ SYNTONY</h1>
+  <div class="day-subtitle" id="day-title">Loading Day...</div>
+
+  <!-- Expanding/Reducing Blinking Eye -->
+  <div class="eye-wrapper">
+    <span id="eye-emoji" class="pulsing-eye">👁️</span>
+  </div>
+
+  <!-- 10-Minute Countdown Timer -->
+  <div class="timer-display" id="timer">10:00</div>
+
+  <!-- Play / Pause Button -->
+  <button class="play-btn" id="play-toggle-btn">START SESSION</button>
+
+  <!-- 30-Day Battery Progress -->
+  <div class="battery-container">
+    <div class="battery-header">
+      <span>🔋 30-Day Battery Recharge</span>
+      <span id="battery-text">Day 1 / 30 (3%)</span>
+    </div>
+    <div class="battery-track">
+      <div class="battery-level" id="battery-fill"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 KishanBali / KEMP Wisdom Publications. All rights reserved.</p>
+  <p class="disclaimer"><strong>Disclaimer:</strong> KEMP EYE 👁️ Syntony is an exploratory procedural audio and focus tool designed for personal relaxation and cognitive calibration. It is not a medical or therapeutic device.</p>
+</footer>
+
+<script>
+class KEMP_SyntonyApp {
+  constructor() {
+    this.totalDuration = 600; // 10 minutes in seconds
+    this.timeLeft = this.totalDuration;
+    this.isPlaying = false;
+    this.timerInterval = null;
+
+    this.currentDay = parseInt(localStorage.getItem('kemp_current_day')) || 1;
+    
+    this.audioCtx = null;
+    this.masterGain = null;
+    this.activeOscillators = [];
+
+    this.initUI();
+    this.updateBatteryUI();
+  }
+
+  initUI() {
+    this.playBtn = document.getElementById('play-toggle-btn');
+    this.timerDisplay = document.getElementById('timer');
+    this.eyeEmoji = document.getElementById('eye-emoji');
+    this.dayTitle = document.getElementById('day-title');
+    this.batteryFill = document.getElementById('battery-fill');
+    this.batteryText = document.getElementById('battery-text');
+
+    this.dayTitle.textContent = Day ${this.currentDay} of 30 — Acoustic Calibration;
+    this.playBtn.addEventListener('click', () => this.togglePlayPause());
+  }
+
+  initAudio() {
+    if (!this.audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.audioCtx = new AudioContext();
+      this.masterGain = this.audioCtx.createGain();
+      this.masterGain.gain.setValueAtTime(0.25, this.audioCtx.currentTime);
+      this.masterGain.connect(this.audioCtx.destination);
+    }
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+  }
+
+  togglePlayPause() {
+    if (!this.isPlaying) {
+      this.startSession();
+    } else {
+      this.pauseSession();
+    }
+  }
+
+  startSession() {
+    this.initAudio();
+    this.isPlaying = true;
+    this.playBtn.textContent = "PAUSE";
+    this.playBtn.classList.add('paused');
+    this.eyeEmoji.classList.add('active');
+
+    this.playCurrentDayAudioModel();
+
+    this.timerInterval = setInterval(() => {
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+        this.updateTimerDisplay();
+      } else {
+        this.completeSession();
+      }
+    }, 1000);
+  }
+
+  pauseSession() {
+    this.isPlaying = false;
+    this.playBtn.textContent = "RESUME";
+    this.playBtn.classList.remove('paused');
+    this.eyeEmoji.classList.remove('active');
+
+    clearInterval(this.timerInterval);
+    this.stopAudio();
+  }
+
+  completeSession() {
+    this.pauseSession();
+    alert(Day ${this.currentDay} Session Complete! Battery charged further.);
+    
+    if (this.currentDay < 30) {
+      this.currentDay++;
+      localStorage.setItem('kemp_current_day', this.currentDay);
+    }
+    
+    this.timeLeft = this.totalDuration;
+    this.updateTimerDisplay();
+    this.updateBatteryUI();
+    this.dayTitle.textContent = Day ${this.currentDay} of 30 — Acoustic Calibration;
+    this.playBtn.textContent = "START SESSION";
+  }
+
+  updateTimerDisplay() {
+    const minutes = Math.floor(this.timeLeft / 60);
+    const seconds = this.timeLeft % 60;
+    this.timerDisplay.textContent = ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')};
+  }
+
+  updateBatteryUI() {
+    const percentage = Math.round((this.currentDay / 30) * 100);
+    this.batteryFill.style.width = ${percentage}%;
+    this.batteryText.textContent = Day ${this.currentDay} / 30 (${percentage}%);
+  }
+
+  stopAudio() {
+    this.activeOscillators.forEach(node => {
+      try { node.stop(); node.disconnect(); } catch (e) {}
+    });
+    this.activeOscillators = [];
+  }
+
+  playCurrentDayAudioModel() {
+    this.stopAudio();
+    const now = this.audioCtx.currentTime;
+
+    const tuningForks = [136.1, 174, 285, 432];
+    const singingBowls = [396, 417, 528, 639];
+    const handpans = [528, 639, 741, 852, 963];
+
+    const modelIndex = Math.abs(Math.floor(Math.sin(this.currentDay * 99) * 10000)) % 3;
+    const freqIndex = Math.abs(Math.floor(Math.sin(this.currentDay * 33) * 10000));
+
+    if (modelIndex === 0) {
+      let freq = tuningForks[freqIndex % tuningForks.length];
+      this.playTuningForkTone(freq, now);
+    } else if (modelIndex === 1) {
+      let freq = singingBowls[freqIndex % singingBowls.length];
+      this.playSingingBowlTone(freq, now);
+    } else {
+      let freq = handpans[freqIndex % handpans.length];
+      this.playHandpanTone(freq, now);
+    }
+  }
+
+  playTuningForkTone(freq, now) {
+    const osc = this.audioCtx.createOscillator();
+    const gainNode = this.audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    gainNode.gain.setValueAtTime(0.001, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.2, now + 2);
+    osc.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    osc.start(now);
+    this.activeOscillators.push(osc);
+  }
+
+  playSingingBowlTone(freq, now) {
+    [1.0, 2.76, 5.4].forEach((ratio, idx) => {
+      const osc = this.audioCtx.createOscillator();
+      const gainNode = this.audioCtx.createGain();
+      osc.type = idx === 0 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq * ratio, now);
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.exponentialRampToValueAtTime(idx === 0 ? 0.2 : 0.05, now + 3);
+      osc.connect(gainNode);
+      gainNode.connect(this.masterGain);
+      osc.start(now);
+      this.activeOscillators.push(osc);
+    });
+  }
+
+  playHandpanTone(freq, now) {
+    const osc = this.audioCtx.createOscillator();
+    const gainNode = this.audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    gainNode.gain.setValueAtTime(0.001, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.22, now + 1.5);
+    osc.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    osc.start(now);
+    this.activeOscillators.push(osc);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  window.kempApp = new KEMP_SyntonyApp();
+});
+</script>
+
+</body>
+</html>
