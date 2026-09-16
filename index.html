@@ -224,7 +224,7 @@ class KEMP_SyntonyApp {
     this.playBtn.addEventListener('click', () => this.togglePlayPause());
   }
 
-  initAudio() {
+  async initAudio() {
     if (!this.audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       this.audioCtx = new AudioContext();
@@ -233,20 +233,20 @@ class KEMP_SyntonyApp {
       this.masterGain.connect(this.audioCtx.destination);
     }
     if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+      await this.audioCtx.resume();
     }
   }
 
-  togglePlayPause() {
+  async togglePlayPause() {
     if (!this.isPlaying) {
-      this.startSession();
+      await this.startSession();
     } else {
       this.pauseSession();
     }
   }
 
-  startSession() {
-    this.initAudio();
+  async startSession() {
+    await this.initAudio();
     this.isPlaying = true;
     this.playBtn.textContent = "PAUSE";
     this.playBtn.classList.add('paused');
